@@ -1,2 +1,4 @@
-py-env/*
+py-env/
 *.asv
+__pycache__/
+*.pyc

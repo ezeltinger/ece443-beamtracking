@@ -2,17 +2,8 @@ import numpy as np
 from numpy.random import rand
 import matplotlib.pyplot as plt
 from users import User
-from plotting import round_robin_search, plot_users
-
-# def binary_search_sectors(sectors, radius, user_angle, ax):
-#     for i in range(0, sectors.size - 1):
-#         if (user_angle >= sectors[i]) and (user_angle <= sectors[i+1]):
-#             print(f"{sectors[i]} to {sectors[i+1]}")
-#             sector = mpatches.Wedge((0.,0.), radius, np.degrees(sectors[i]), np.degrees(sectors[i+1]), color=[rand(), rand(), rand()], alpha=0.5)
-#             ax.add_patch(sector)
-#             divided_sectors = np.array([sectors[i], mean([sectors[i], sectors[i+1]]), sectors[i+1]])
-#             break
-#     return divided_sectors
+from search import round_robin_search
+from plotting import plot_users
 
 # Circle
 r1 = 1
