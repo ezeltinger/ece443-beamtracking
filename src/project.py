@@ -5,7 +5,7 @@ from users import User
 from search import round_robin_search
 from plotting import plot_users
 
-# Circle
+# Circular Cell
 r1 = 1
 q1 = np.linspace(0,2*np.pi,50)
 x1 = r1*np.cos(q1)
@@ -20,8 +20,6 @@ for _ in range(num_users):
 fig, ax = plt.subplots()
 ax.plot(x1, y1, color='tab:blue')
 plot_users(users=user_list, ax=ax)
-
-# ax.plot(xu, yu, marker='o')
 
 # Create and plot starting sectors
 sector_borders = np.array([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi])
