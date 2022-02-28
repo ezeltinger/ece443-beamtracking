@@ -1,7 +1,7 @@
 from numpy.random import rand
 
 class Beam:
-    def __init__(self, start_angle, end_angle, length=1, color=[rand(), rand(), rand()]):
+    def __init__(self, start_angle, end_angle, length=1, color=[0, 0.5, 0]):
         self.start_angle = start_angle
         self.end_angle = end_angle
         self.length = length
