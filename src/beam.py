@@ -1,25 +1,25 @@
-import numpy as np
 from numpy.random import rand
-import matplotlib.patches as mpatches
-from statistics import mean
 
 class Beam:
-    def __init__(self, angle_one, angle_two, length=1, color=[rand(), rand(), rand()]):
-        self.angle_one = angle_one
-        self.angle_two = angle_two
+    def __init__(self, start_angle, end_angle, length=1, color=[rand(), rand(), rand()]):
+        self.start_angle = start_angle
+        self.end_angle = end_angle
         self.length = length
         self.color = color
+    
+    @property
     def span(self):
-        span_value = self.angle_two - self.angle_one
-        return span_value
+        return self.end_angle - self.start_angle
+    
+    @property
     def middle(self):
-        average = (self.angle_two + self.angle_one)/2
-        return average
+        return (self.end_angle + self.start_angle)/2
+    
     def split(self):
-        middle = self.middle()
-        upper_beam = Beam(middle, self.angle_two)
-        lower_beam = Beam(self.angle_one, middle)
+        upper_beam = Beam(self.middle, self.end_angle)
+        lower_beam = Beam(self.start_angle, self.middle)
         return lower_beam, upper_beam
-    def setAngles(self, angle_one, angle_two):
-        self.angle_one = angle_one
-        self.angle_two = angle_two
+    
+    def setAngles(self, start_angle, end_angle):
+        self.start_angle = start_angle
+        self.end_angle = end_angle

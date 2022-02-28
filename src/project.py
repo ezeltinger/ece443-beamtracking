@@ -1,14 +1,12 @@
-import numpy as np
-from numpy.random import rand
 import matplotlib.pyplot as plt
 from users import User, move_users
 from search import round_robin_search
 from plotting import Cell, Plot
 
 # Circular Cell
-cell = Cell(1) # Radius 1
+cell = Cell(radius=1)
 
-#Create users
+# Create users
 num_users = 2
 user_list = []
 for _ in range(num_users):

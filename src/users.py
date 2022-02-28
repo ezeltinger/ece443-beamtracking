@@ -1,6 +1,5 @@
 import numpy as np
 from numpy.random import rand
-import matplotlib.pyplot as plt
 from brownian import brownian
 from typing import Union, Sequence
 

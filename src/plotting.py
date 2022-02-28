@@ -35,8 +35,8 @@ class Plot:
 
     def add_beam(self, beam: Beam): # To plot a single Beam
         wedge = mpatches.Wedge((0.,0.), beam.length,
-                                    np.degrees(beam.angle_one),
-                                    np.degrees(beam.angle_two),
+                                    np.degrees(beam.start_angle),
+                                    np.degrees(beam.end_angle),
                                     color = beam.color, # color of beam
                                     alpha = 0.5) # Make the wedges transparent
         self.ax.add_patch(wedge)
