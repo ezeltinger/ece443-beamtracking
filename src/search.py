@@ -12,10 +12,10 @@ def send_beam(beam: Beam, users, cell_radius):
     return ack
 
 def tolerance_met(beam_list: Union[Beam, Sequence[Beam]], tolerance):
-    flag = true
+    flag = True
     for beam in beam_list:
         if beam.span < tolerance:
-            flag = false
+            flag = False
     return flag
 
 def round_robin_search(cell: Cell, users: Union[User, Sequence[User]], tolerance):
