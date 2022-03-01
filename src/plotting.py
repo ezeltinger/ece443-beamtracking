@@ -59,7 +59,7 @@ class Plot:
         if num_steps is not None:
             num_steps = num_steps + 1
         for user in users:
-            self.ax.plot(user.path[0, 0:num_steps], user.path[1, 0:num_steps])
+            self.ax.plot(user.path[0, 0:num_steps], user.path[1, 0:num_steps], color = user.path_color)
 
     def clear_users(self):
         for point in self.points:
