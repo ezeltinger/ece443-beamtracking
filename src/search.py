@@ -8,14 +8,14 @@ def send_beam(beam: Beam, users, cell_radius):
     ack = 0
     for user in users:
         if (user.theta >= beam.start_angle) and (user.theta <= beam.end_angle) and (user.radius <= cell_radius):
-            ack = 1
+            ack = ack + 1
     return ack
 
 def tolerance_met(beam_list: Union[Beam, Sequence[Beam]], tolerance):
-    flag = 1
+    flag = true
     for beam in beam_list:
         if beam.span < tolerance:
-            flag = 0
+            flag = false
     return flag
 
 def round_robin_search(cell: Cell, users: Union[User, Sequence[User]], tolerance):
