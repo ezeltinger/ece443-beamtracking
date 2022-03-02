@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from users import User, move_users
-from search import round_robin_search
+from search import exhaustive_search
 from plotting import Cell, Plot
 
 # Circular Cell
@@ -17,7 +17,7 @@ plot = Plot(cell)
 plot.add_users(users=user_list)
 
 # Search for each user
-beams = round_robin_search(cell, user_list, tolerance=0.1)
+beams = exhaustive_search(cell, user_list, beam_count=8)
 # Plot the beam where the user is found
 plot.add_beams(beams)
 
@@ -42,7 +42,7 @@ for step in range(num_steps):
     plot.add_users(users=user_list)
 
     # Cast beams to search for users and plot
-    beams = round_robin_search(cell, user_list, tolerance=0.1)
+    beams = exhaustive_search(cell, user_list, beam_count=8)
     plot.add_beams(beams)
     plt.pause(0.1)
 
