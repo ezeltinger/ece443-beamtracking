@@ -44,6 +44,10 @@ def find_beam(beam_ack_list: Sequence[Beam], beam_count):
         return Beam(2*np.pi - np.pi/beam_count, 2*np.pi)
 
 def exhaustive_search(cell: Cell, users: Union[User, Sequence[User]], beam_count):
+    """
+    An algorithm to exhaustively search the cell for users.
+    Uncertainty region is always 2pi/beam_count
+    """
     beam_width = 2*np.pi/beam_count
     beam_list = []
     
@@ -58,6 +62,11 @@ def exhaustive_search(cell: Cell, users: Union[User, Sequence[User]], beam_count
     return beam_list
 
 def upper_bound_search(cell: Cell, users: User, beam_count):
+    """
+    An algorithm to search for a single user with contiguous beams.
+    The uncertainty region for this method is pi/beam_count.
+    This models the upper bound of possible uncertainty regions for contiguous beams.
+    """
     beam_ack_list = []
     for i in range(beam_count):
         beam = Beam(i*np.pi/beam_count, np.pi + i*np.pi/beam_count)
