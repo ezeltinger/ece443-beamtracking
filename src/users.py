@@ -27,7 +27,7 @@ class User:
     """Class for tracking user position
     """
     def __init__(self, radius=None, theta=None, path_color = [rand(), rand(), rand()]):
-        self.radius = radius if radius is not None else rand()
+        self.radius = radius if radius is not None else np.sqrt(rand())
         self.theta = theta if theta is not None else 2*np.pi*rand()
         self.x, self.y = pol2cart(self.radius, self.theta)
         self.path = None
