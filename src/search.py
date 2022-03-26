@@ -1,24 +1,39 @@
-from re import T
 import numpy as np
 from users import User, UserError
-from beam import Beam
+from beam import Beam, SplitBeam
 from typing import Union, Sequence
 from plotting import Cell
 
-def send_beam(beam: Beam, users: Union[User, Sequence[User]], cell_radius):
+def send_beam(beam: Union[Beam, SplitBeam], users: Union[User, Sequence[User]], cell_radius):
     ack = 0
+    # Only iterate over users if they are in a sequence
     if isinstance(users, Sequence):
-        for user in users:
-            if (user.theta >= beam.start_angle) and (user.theta <= beam.end_angle) and (user.radius <= cell_radius):
-                ack = ack + 1
+        # TODO - Add support for SplitBeam usage
+        # non_contiguous_search() only uses single user at this point
+        if isinstance(beam, SplitBeam):
+            for partial_beam in beam.partial_beams:
+                for user in users:
+                    ack = ack + get_ack(partial_beam, user, cell_radius)
+        else:
+            for user in users:
+                ack = ack + get_ack(beam, user, cell_radius)
     elif isinstance(users, User):
-        if (users.theta >= beam.start_angle) and (users.theta <= beam.end_angle) and (users.radius <= cell_radius):
-            ack = 1
+        if isinstance(beam, SplitBeam):
+            for partial_beam in beam.partial_beams:
+                ack = ack or get_ack(partial_beam, users)
+        else:
+            ack = get_ack(beam, user, cell_radius)
     else:
         raise UserError(f"Can not search for objects of type {type(users)}")
     return ack
 
-def find_beam(beam_ack_list: Sequence[Beam], beam_count):
+def get_ack(beam: Beam, user: User, cell_radius):
+    ack = 0
+    if (user.theta >= beam.start_angle) and (user.theta <= beam.end_angle) and (user.radius <= cell_radius):
+        ack = 1
+    return ack
+
+def find_beam_contiguous(beam_ack_list: Sequence[Beam], beam_count):
     # Check for acks
     if [beam_ack for beam_ack in beam_ack_list if beam_ack[1] == 1]:
         # start with the case where all beams return an ack
@@ -43,6 +58,45 @@ def find_beam(beam_ack_list: Sequence[Beam], beam_count):
     else: # There are no acks
         return Beam(2*np.pi - np.pi/beam_count, 2*np.pi)
 
+def _special_sauce(beam: Beam, ack, weird_algorithm_flag):
+    if weird_algorithm_flag:
+        if ack:
+            # User is in the first half of the beam
+            weird_algorithm_flag = False
+            return Beam(start_angle=beam.start_angle, end_angle=beam.middle), weird_algorithm_flag
+        else:
+            weird_algorithm_flag = True
+            # User is in the second half of the beam
+            return Beam(start_angle=beam.middle, end_angle=beam.end_angle), weird_algorithm_flag
+    else:
+        if not ack:
+            # User is in the first half of the beam
+            weird_algorithm_flag = False
+            return Beam(start_angle=beam.start_angle, end_angle=beam.middle), weird_algorithm_flag
+        else:
+            # User is in the second half of the beam
+            weird_algorithm_flag = True
+            return Beam(start_angle=beam.middle, end_angle=beam.end_angle), weird_algorithm_flag
+
+def find_beam_non_contiguous(beam_ack_list):
+    ack_bits = []
+    ack_quadrant_map = [(3*np.pi/2, 2*np.pi, 4), (np.pi, 3*np.pi/2, 3), (0, np.pi/2, 1), (np.pi/2, np.pi, 2)]
+    for _, ack in beam_ack_list:
+        ack_bits.append(ack)
+    quadrant_index = (ack_bits[0] << 1) + ack_bits[1]
+    start_angle, end_angle, quadrant = ack_quadrant_map[quadrant_index]
+    quadrant_beam = Beam(start_angle, end_angle)
+    if quadrant == 2 or quadrant == 4:
+        weird_algorithm_flag = True
+    else:
+        weird_algorithm_flag = False
+    beam, weird_algorithm_flag = _special_sauce(quadrant_beam, ack_bits[2], weird_algorithm_flag)
+    
+    for ack in ack_bits[3:]:
+        beam, weird_algorithm_flag = _special_sauce(beam, ack, weird_algorithm_flag)
+
+    return beam
+
 def exhaustive_search(cell: Cell, users: Union[User, Sequence[User]], beam_count):
     """
     An algorithm to exhaustively search the cell for users.
@@ -61,7 +115,7 @@ def exhaustive_search(cell: Cell, users: Union[User, Sequence[User]], beam_count
 
     return beam_list
 
-def upper_bound_search(cell: Cell, users: User, beam_count):
+def contiguous_search(cell: Cell, users: User, beam_count):
     """
     An algorithm to search for a single user with contiguous beams.
     The uncertainty region for this method is pi/beam_count.
@@ -74,4 +128,35 @@ def upper_bound_search(cell: Cell, users: User, beam_count):
         ack = send_beam(beam, users, cell.radius)
         beam_ack_list.append((beam, ack))
     
-    return find_beam(beam_ack_list, beam_count)
+    return find_beam_contiguous(beam_ack_list, beam_count)
+
+def non_contiguous_search(cell: Cell, user: User, beam_count):
+    """
+    An algorithm to search for a single user with non-contiguous beams.
+    The uncertainty region for this method is pi/(2^(beam_count-1))
+    """
+    if beam_count < 3:
+        raise Exception("Beam count must be 3 or more.")
+    beam_ack_list = []
+    
+    for i in range(beam_count):
+        if i == 0:
+            beam = Beam(0, np.pi)
+            ack = send_beam(beam, user, cell.radius)
+            beam_ack_list.append((beam, ack))
+        elif i == 1:
+            beam = Beam(np.pi/2, 3*np.pi/2)
+            ack = send_beam(beam, user, cell.radius)
+            beam_ack_list.append((beam, ack))
+        else:
+            beam_parts = 2**(i-1)  # Number of sectors in the non-contiguous beam
+            partial_beams = []  # List of beams that make up the single non-contiguous beam
+            for part in range(beam_parts):
+                beam_shift = part*np.pi/(2**(i-2))
+                beam = Beam(np.pi/(2**i) + beam_shift, 3*np.pi/(2**i) + beam_shift)
+                partial_beams.append(beam)
+            beam = SplitBeam(partial_beams)
+            # Check Beam and mark with acknowledgements
+            ack = send_beam(beam, user, cell.radius)
+            beam_ack_list.append((beam, ack))
+    return find_beam_non_contiguous(beam_ack_list, beam_count)

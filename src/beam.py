@@ -1,4 +1,4 @@
-from numpy.random import rand
+from typing import Sequence
 
 class Beam:
     def __init__(self, start_angle, end_angle, length=1, color=[0, 0.5, 0]):
@@ -23,3 +23,7 @@ class Beam:
     def setAngles(self, start_angle, end_angle):
         self.start_angle = start_angle
         self.end_angle = end_angle
+
+class SplitBeam:
+    def __init__(self, beam_list: Sequence[Beam]):
+        self.partial_beams = beam_list

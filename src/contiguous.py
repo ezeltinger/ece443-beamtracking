@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from users import User, move_users
-from search import exhaustive_search
+from search import contiguous_search
 from plotting import Cell, Plot
 from time import perf_counter
 from gif import create_gif
@@ -10,22 +10,21 @@ cell = Cell(radius=1)
 
 # Create users
 num_users = 1
-user_list = []
-for _ in range(num_users):
-    user_list.append(User())
+user = User()
+user_list = [user]
 
 # Create plot of cell with borders and add users
 plot = Plot(cell)
 plot.add_users(users=user_list)
 
 # Search for each user
-beam_count = 36
-beams = exhaustive_search(cell, user_list, beam_count=beam_count)
+beam_count = 18
+beam = contiguous_search(cell, user_list, beam_count=beam_count)
+plt.savefig('../output/up_0.png')
+beams = [beam]
 # Plot the beam where the user is found
 plot.add_beams(beams)
-plt.savefig('../output/exh_0.png')
-plot.ax.set_title(f'Exhaustive Search, b = {beam_count}, U = pi/{beam_count/2}')
-
+plot.ax.set_title(f'Contiguous Search, b = {beam_count}, U = pi/{beam_count}')
 
 # Add some brownian motion to the users
 # Total time
@@ -49,13 +48,14 @@ for step in range(num_steps):
 
     # Cast beams to search for users and plot
     start = perf_counter()
-    beams = exhaustive_search(cell, user_list, beam_count=beam_count)
+    beam = contiguous_search(cell, user_list, beam_count=beam_count)
     stop = perf_counter()
     search_time += stop - start
+    beams = [beam]
     plot.add_beams(beams)
+    plt.savefig(f'../output/up_{step}.png')
     plt.pause(0.1)
-    plt.savefig(f'../output/exh_{step+1}.png')
 
-print(f"Avg. search time for exhaustive search: {search_time/num_steps}")
-create_gif(f'exhaustive_search{num_users}')
+print(f"Avg. search time for contiguous_search: {search_time/num_steps}")
+create_gif(f'upper_contiguous_search{num_users}')
 plot.show()

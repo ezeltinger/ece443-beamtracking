@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 from users import User, move_users
-from search import upper_bound_search
+from search import non_contiguous_search
 from plotting import Cell, Plot
 from time import perf_counter
 from gif import create_gif
+import numpy as np
 
 # Circular Cell
 cell = Cell(radius=1)
@@ -18,11 +19,13 @@ plot = Plot(cell)
 plot.add_users(users=user_list)
 
 # Search for each user
-beam = upper_bound_search(cell, user_list, beam_count=18)
-plt.savefig('../output/up_0.png')
+beam_count=5
+beam = non_contiguous_search(cell, user_list, beam_count=beam_count)
+plt.savefig('../output/non_0.png')
 beams = [beam]
 # Plot the beam where the user is found
 plot.add_beams(beams)
+plot.ax.set_title(f'Non-Contiguous Search, b = {beam_count}, U = pi/{2**(beam_count-1)}')
 
 
 # Add some brownian motion to the users
@@ -47,14 +50,15 @@ for step in range(num_steps):
 
     # Cast beams to search for users and plot
     start = perf_counter()
-    beam = upper_bound_search(cell, user_list, beam_count=18)
+    beam = non_contiguous_search(cell, user_list, beam_count=beam_count)
     stop = perf_counter()
     search_time += stop - start
     beams = [beam]
     plot.add_beams(beams)
-    plt.savefig(f'../output/up_{step}.png')
+    plt.savefig(f'../output/non_cont_{step}.png')
     plt.pause(0.1)
 
-print(f"Avg. search time for upper_bound_search: {search_time/num_steps}")
-create_gif(f'upper_contiguous_search{num_users}')
+print(f"Avg. search time for non_contiguous_search: {search_time/num_steps}")
+create_gif(f'non_contiguous_search{num_users}')
+
 plot.show()
