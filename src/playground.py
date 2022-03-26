@@ -63,7 +63,7 @@ def exh_search_demo():
     create_gif('exh_search_demo')
 
 def show_split_beam(beam_number):
-    i = beam_number
+    i = beam_number - 1
     sectors = 32
     for count in range(sectors):
             ri = 1
