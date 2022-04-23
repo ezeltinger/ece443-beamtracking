@@ -5,6 +5,7 @@ from plotting import Cell, Plot
 from time import perf_counter
 from gif import create_gif
 import numpy as np
+from statistics import mean
 
 # Circular Cell
 cell = Cell(radius=1)
@@ -20,7 +21,9 @@ plot.add_users(users=user_list)
 
 # Search for each user
 beam_count=5
-beam = non_contiguous_search(cell, user_list, beam_count=beam_count)
+search_times = []
+beam, search_time = non_contiguous_search(cell, user_list, beam_count=beam_count)
+search_times.append(search_time)
 plt.savefig('../output/non_0.png')
 beams = [beam]
 # Plot the beam where the user is found
@@ -37,7 +40,7 @@ num_steps = 50
 for user in user_list:
     user.create_path(total_time, num_steps)
 
-search_time = 0
+python_time = 0
 for step in range(num_steps):
     # Remove old beams and users from plot
     plot.clear_beams()
@@ -50,15 +53,16 @@ for step in range(num_steps):
 
     # Cast beams to search for users and plot
     start = perf_counter()
-    beam = non_contiguous_search(cell, user_list, beam_count=beam_count)
+    beam, search_time = non_contiguous_search(cell, user_list, beam_count=beam_count)
     stop = perf_counter()
-    search_time += stop - start
+    search_times.append(search_time)
+    python_time += stop - start
     beams = [beam]
     plot.add_beams(beams)
     plt.savefig(f'../output/non_cont_{step}.png')
     plt.pause(0.1)
 
-print(f"Avg. search time for non_contiguous_search: {search_time/num_steps}")
+print(f"Avg. search time for non_contiguous_search\nPython execution time: {python_time/num_steps} secs\nBeam send/receive time: {mean(search_times)} secs")
 create_gif(f'non_contiguous_search{num_users}')
 
 plot.show()

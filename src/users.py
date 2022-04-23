@@ -26,12 +26,15 @@ def pol2cart(rho, theta):
 class User:
     """Class for tracking user position
     """
+    idGenerator = (x for x in range(0x01, 0xFF))
+
     def __init__(self, radius=None, theta=None, path_color = [rand(), rand(), rand()]):
         self.radius = radius if radius is not None else np.sqrt(rand())
         self.theta = theta if theta is not None else 2*np.pi*rand()
         self.x, self.y = pol2cart(self.radius, self.theta)
         self.path = None
         self.path_color = path_color
+        self.id = User.idGenerator.__next__()
 
     def create_path(self, time, steps, delta=0.25):
         dt = time/steps

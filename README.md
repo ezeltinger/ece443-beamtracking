@@ -27,7 +27,11 @@ python exhaustive.py
 or
 
 ```
-python upper_bound.py
+python contiguous.py
+```
+
+```
+python non-contiguous.py
 ```
 
 ## Examples

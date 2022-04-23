@@ -17,14 +17,8 @@ def send_beam(beam: Union[Beam, SplitBeam], users: Union[User, Sequence[User]], 
         else:
             for user in users:
                 ack = ack + get_ack(beam, user, cell_radius)
-    elif isinstance(users, User):
-        if isinstance(beam, SplitBeam):
-            for partial_beam in beam.partial_beams:
-                ack = ack or get_ack(partial_beam, users)
-        else:
-            ack = get_ack(beam, user, cell_radius)
     else:
-        raise UserError(f"Can not search for objects of type {type(users)}")
+        raise UserError(f"Can not search for objects of type {type(users)}. Must be of type Sequence[User]")
     return ack
 
 def get_ack(beam: Beam, user: User, cell_radius):
@@ -32,6 +26,15 @@ def get_ack(beam: Beam, user: User, cell_radius):
     if (user.theta >= beam.start_angle) and (user.theta <= beam.end_angle) and (user.radius <= cell_radius):
         ack = 1
     return ack
+
+def search_timing(beam_count, cell_radius):
+    """
+    Calculate the amount of time it takes to send each beam and receive the response.
+    """
+    c = 3e08
+    time_delay = cell_radius/c
+    search_time = 2*time_delay*beam_count
+    return search_time
 
 def find_beam_contiguous(beam_ack_list: Sequence[Beam], beam_count):
     # Check for acks
@@ -113,7 +116,7 @@ def exhaustive_search(cell: Cell, users: Union[User, Sequence[User]], beam_count
         if acks != 0:
             beam_list.append(beam)
 
-    return beam_list
+    return beam_list, search_timing(beam_count, cell.radius)
 
 def contiguous_search(cell: Cell, users: User, beam_count):
     """
@@ -128,7 +131,7 @@ def contiguous_search(cell: Cell, users: User, beam_count):
         ack = send_beam(beam, users, cell.radius)
         beam_ack_list.append((beam, ack))
     
-    return find_beam_contiguous(beam_ack_list, beam_count)
+    return find_beam_contiguous(beam_ack_list, beam_count), search_timing(beam_count, cell.radius)
 
 def non_contiguous_search(cell: Cell, user: User, beam_count):
     """
@@ -159,4 +162,4 @@ def non_contiguous_search(cell: Cell, user: User, beam_count):
             # Check Beam and mark with acknowledgements
             ack = send_beam(beam, user, cell.radius)
             beam_ack_list.append((beam, ack))
-    return find_beam_non_contiguous(beam_ack_list, beam_count)
+    return find_beam_non_contiguous(beam_ack_list), search_timing(beam_count, cell.radius)
