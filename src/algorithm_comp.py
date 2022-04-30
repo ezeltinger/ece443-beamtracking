@@ -42,4 +42,5 @@ xlabels = ['0', r'$\frac{%s}{%s}$'%('\pi',16),
 ax.set_xticklabels(xlabels)
 ax.set_xlabel('Uncertainty Region (radians)')
 plt.title('Minimum Time to Achieve Uncertainty Region')
+plt.savefig('../saved_examples/algorithm_comp.png')
 plt.show()
