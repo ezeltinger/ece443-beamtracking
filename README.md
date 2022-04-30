@@ -46,6 +46,12 @@ python non-contiguous.py
 
 ![contig-single-user-18](saved_examples/upper_contiguous_search1_18beams.gif)
 
+### Non-Contiguous Beams - Single user
+
+![non-contig-single-user-3](saved_examples/non_contiguous_searchb3.gif)
+
+![non-contig-single-user-5](saved_examples/non_contiguous_searchb5.gif)
+
 ### Exhaustive Search - Multi User
 
 ![exh-search-multi-user-10](saved_examples/exhaustive_search10.gif)

@@ -4,7 +4,7 @@ Use wisely and keep the good stuff.
 """
 import matplotlib.pyplot as plt
 from users import User, move_users
-from search import contiguous_search, exhaustive_search
+from search import contiguous_search, exhaustive_search, non_contiguous_search
 from plotting import Cell, Plot
 from time import perf_counter
 from gif import create_gif
@@ -36,7 +36,7 @@ def upper_cont_demo():
 
     # Search for each user
     plot.clear_beams()
-    beam = contiguous_search(cell, user_list, beam_count=beam_count)
+    beam = contiguous_search(cell, user_list, beam_count=beam_count)[0]
     plot.add_beam(beam)
     for k in range(10):
         plt.savefig(f'../output/up_{i+1}_{k}.png')
@@ -80,8 +80,38 @@ def show_split_beam(beam_number):
     beam = SplitBeam(partial_beams)
     plot.add_beams([beam])
 
+def non_cont_demo():
+    beam_count = 6
+    for i in range(beam_count):
+        plot.clear_beams()
+        if i == 0:
+            beam = Beam(0, np.pi)
+        elif i == 1:
+            beam = Beam(np.pi/2, 3*np.pi/2)
+        else:
+            beam_parts = 2**(i-1)  # Number of sectors in the non-contiguous beam
+            partial_beams = []  # List of beams that make up the single non-contiguous beam
+            for part in range(beam_parts):
+                beam_shift = part*np.pi/(2**(i-2))
+                beam = Beam(np.pi/(2**i) + beam_shift, 3*np.pi/(2**i) + beam_shift)
+                partial_beams.append(beam)
+            beam = SplitBeam(partial_beams)
+        plot.add_beams([beam])
+        for k in range(10):
+            plt.savefig(f'../output/non_cont_{i}_{k}.png')
+        plt.pause(0.1)
+
+    # Search for each user
+    plot.clear_beams()
+    beam = non_contiguous_search(cell, user_list, beam_count=beam_count)[0]
+    plot.add_beam(beam)
+    for k in range(10):
+        plt.savefig(f'../output/up_{i+1}_{k}.png')
+    create_gif('non_cont_search_demo')
+
 if __name__ == "__main__":
     # exh_search_demo()
     # upper_cont_demo()
-    show_split_beam(beam_number=3)
+    non_cont_demo()
+    # show_split_beam(beam_number=3)
     plot.show()
