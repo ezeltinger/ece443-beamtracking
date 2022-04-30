@@ -4,7 +4,7 @@ from matplotlib.axes import Axes
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from users import User
-from beam import Beam
+from beam import Beam, SplitBeam
 from typing import Union, Sequence
 
 # Circular Cell
@@ -44,9 +44,13 @@ class Plot:
     def clear_beams(self):
         [p.remove() for p in reversed(self.ax.patches)]
 
-    def add_beams(self, beams: Union[Beam, Sequence[Beam]]): # To plot multiple beams
+    def add_beams(self, beams): # To plot multiple beams
         for beam in beams:
-            self.add_beam(beam)
+            if isinstance(beam, SplitBeam):
+                for partial_beam in beam.partial_beams:
+                    self.add_beam(partial_beam)
+            else:
+                self.add_beam(beam)
 
     def add_users(self, users: Union[User, Sequence[User]]): # To plot multiple users
         self.points = []
@@ -65,6 +69,5 @@ class Plot:
         for point in self.points:
             point.remove()
             
-
     def show(self):
         plt.show()

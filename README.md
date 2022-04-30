@@ -17,8 +17,43 @@ create_venv.bat
 
 ## Running the Simulation
 
-To run the python script, simply call
+There is a script for each beam search method.
 
 ```cmd
-python project.py
+cd src
+python exhaustive.py
 ```
+
+or
+
+```
+python contiguous.py
+```
+
+```
+python non-contiguous.py
+```
+
+## Examples
+
+### Exhaustive Search - Single User
+
+![exh-search-single-user](saved_examples/exh_search_demo.gif)
+
+### Contiguous Beams - Single User
+
+![contig-single-user-4](saved_examples/upper_cont_demo.gif)
+
+![contig-single-user-18](saved_examples/upper_contiguous_search1_18beams.gif)
+
+### Non-Contiguous Beams - Single user
+
+![non-contig-single-user-3](saved_examples/non_contiguous_searchb3.gif)
+
+![non-contig-single-user-5](saved_examples/non_contiguous_searchb5.gif)
+
+### Exhaustive Search - Multi User
+
+![exh-search-multi-user-10](saved_examples/exhaustive_search10.gif)
+
+![exh-search-multi-user-7](saved_examples/exhaustive_search7.gif)

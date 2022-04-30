@@ -2,3 +2,4 @@ py-env/
 *.asv
 __pycache__/
 *.pyc
+output/

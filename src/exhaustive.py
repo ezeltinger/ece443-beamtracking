@@ -1,13 +1,16 @@
 import matplotlib.pyplot as plt
 from users import User, move_users
-from search import round_robin_search
+from search import exhaustive_search
 from plotting import Cell, Plot
+from time import perf_counter
+from gif import create_gif
+from statistics import mean
 
 # Circular Cell
 cell = Cell(radius=1)
 
 # Create users
-num_users = 2
+num_users = 1
 user_list = []
 for _ in range(num_users):
     user_list.append(User())
@@ -17,20 +20,26 @@ plot = Plot(cell)
 plot.add_users(users=user_list)
 
 # Search for each user
-beams = round_robin_search(cell, user_list, tolerance=0.1)
+beam_count = 36
+search_times = []
+beams, search_time = exhaustive_search(cell, user_list, beam_count=beam_count)
+search_times.append(search_time)
 # Plot the beam where the user is found
 plot.add_beams(beams)
+plt.savefig('../output/exh_0.png')
+plot.ax.set_title(f'Exhaustive Search, b = {beam_count}, U = pi/{beam_count/2}')
 
 
 # Add some brownian motion to the users
 # Total time
 total_time = 5.0
 # Number of steps
-num_steps = 200
+num_steps = 50
 
 for user in user_list:
     user.create_path(total_time, num_steps)
 
+python_time = 0
 for step in range(num_steps):
     # Remove old beams and users from plot
     plot.clear_beams()
@@ -42,9 +51,15 @@ for step in range(num_steps):
     plot.add_users(users=user_list)
 
     # Cast beams to search for users and plot
-    beams = round_robin_search(cell, user_list, tolerance=0.1)
+    start = perf_counter()
+    beams, search_time = exhaustive_search(cell, user_list, beam_count=beam_count)
+    stop = perf_counter()
+    search_times.append(search_time)
+    python_time += stop - start
     plot.add_beams(beams)
     plt.pause(0.1)
+    plt.savefig(f'../output/exh_{step+1}.png')
 
-
+print(f"Avg. search time for exhaustive search\nPython execution time: {python_time/num_steps} secs\nBeam send/receive time: {mean(search_times)} secs")
+create_gif(f'exhaustive_search{num_users}')
 plot.show()
