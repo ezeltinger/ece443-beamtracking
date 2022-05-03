@@ -1,10 +1,15 @@
 # ECE443 - Beamtracking Project
 
 This is a project for ECE 443: Analog and Digital Communications to model beamtracking systems in wireless communications.
+Based on a paper that can be found [here](https://arxiv.org/abs/2001.06595).
 
 ## Dependencies
 
 - [Python 3.x](https://www.python.org/downloads/)
+- numpy
+- scipy
+- matplotlib
+- imageio
 
 ## Python Virtual Environment
 
@@ -33,6 +38,14 @@ python contiguous.py
 ```
 python non-contiguous.py
 ```
+
+### Other Scripts
+
+- playground.py
+    - Produces animations of each beam in the search algorithms as a plot and a gif in `./output/`.
+    - Uncomment the desired functions in `if __name__ == "__main__"` block to produce the desired animation.
+- algorithm_comp.py
+    - Plots a comparison of each of the search algorithms.
 
 ## Examples
 
